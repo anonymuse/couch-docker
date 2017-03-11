@@ -17,14 +17,18 @@ curl -v http://127.0.0.1:8091/node/controller/setupServices -d \
 
 # Setup credentials
 curl -v http://127.0.0.1:8091/settings/web -d port=8091 -d \
-    username=Administrator -d password=password
+    username=admin -d password=password
 
 # Setup Memory Optimized Indexes
-curl -i -u Administrator:password -X POST \
+curl -i -u admin:password -X POST \
     http://127.0.0.1:8091/settings/indexes -d 'storageMode=memory_optimized'
 
-# Load sample buckets
-curl -v -u Administrator:password -X POST \
+# Delete the travel sample bucket
+curl -v -u administrator:password -X DELETE \
+    http://127.0.0.1:8091/pools/default/buckets/travel-sample
+
+# Load smaller beer sample bucket
+curl -v -u admin:password -X POST \
     http://127.0.0.1:8091/sampleBuckets/install -d '["beer-sample"]'
 
 echo "Type: $TYPE"
@@ -40,12 +44,12 @@ if [ "$TYPE" = "WORKER" ]; then
   echo "Auto Rebalance: $AUTO_REBALANCE"
   if [ "$AUTO_REBALANCE" = "true" ]; then
     couchbase-cli rebalance --cluster=$COUCHBASE_MASTER:8091 \
-        --user=Administrator --password=password --server-add=$IP \
-        --server-add-username=Administrator --server-add-password=password
+        --user=admin --password=password --server-add=$IP \
+        --server-add-username=admin --server-add-password=password
   else
     couchbase-cli server-add --cluster=$COUCHBASE_MASTER:8091 \
-        --user=Administrator --password=password --server-add=$IP \
-        --server-add-username=Administrator --server-add-password=password
+        --user=admin --password=password --server-add=$IP \
+        --server-add-username=admin --server-add-password=password
   fi;
 fi;
 
